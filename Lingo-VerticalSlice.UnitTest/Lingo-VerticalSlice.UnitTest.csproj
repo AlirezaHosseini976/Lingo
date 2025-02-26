@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>Lingo_VerticalSliceTest</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoFixture" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.AutoMoq" Version="5.0.0-preview0012" />
+        <PackageReference Include="AutoFixture.Xunit2" Version="5.0.0-preview0012" />
+        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+        <PackageReference Include="FluentAssertions" Version="8.0.1" />
+        <PackageReference Include="FluentValidation" Version="12.0.0-preview1" />
+        <PackageReference Include="FluentValidation.Validators.UnitTestExtension" Version="1.11.0.2" />
+        <PackageReference Include="HttpContextMoq" Version="1.7.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="xunit" Version="2.5.3"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Lingo-VerticalSlice\Lingo-VerticalSlice.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="CardSet\MockedDependencies\" />
+    </ItemGroup>
+
+</Project>

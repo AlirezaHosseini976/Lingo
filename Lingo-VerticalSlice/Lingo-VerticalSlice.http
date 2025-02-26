@@ -1,0 +1,6 @@
+@Lingo_VerticalSlice_HostAddress = http://localhost:5270
+
+GET {{Lingo_VerticalSlice_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
