@@ -32,15 +32,10 @@ public class CreateCardSetFolderRepository : ICreateCardSetFolderRepository
     {
         _applicationDbContext.Folder.Add(folder);
         await _applicationDbContext.SaveChangesAsync(cancellationToken);
-        var cardSetId = await _applicationDbContext.CardSet
-            .Where(c => c.FolderId == folder.Id) 
-            .OrderBy(c => c.Id) 
-            .Select(c => c.Id) 
-            .FirstOrDefaultAsync(cancellationToken);
         var response = new CreateCardSetFolderResponse
         {
             FolderId = folder.Id,
-            CardSetId = cardSetId
+            CardSetId = folder.CardSets.First().Id
         };
         return response;
     }

@@ -41,13 +41,11 @@ public class RepositoryTests : IDisposable
         };
         var defaultCardSet = new CardSet
         {
-            FolderId = 4,
             Name = "default",
 
         };
         var folder = new Folder
         {
-            UserId = "qwerty",
             Name = "folderName",
             CardSets = new List<CardSet>
             {
