@@ -7,14 +7,15 @@ namespace Lingo_VerticalSlice.Database;
 
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
-    public ApplicationDbContext()
-    {
-            
-    }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
     {
-            
+        
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+    }
+
     public DbSet<CardSet> CardSet { get; set; }
     public DbSet<Folder> Folder { get; set; }
     public DbSet<Word> Word { get; set; }

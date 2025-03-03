@@ -1,9 +1,11 @@
-﻿using Lingo_VerticalSlice.Contracts.AnonymousEmail;
+﻿using System.Security.Claims;
+using Lingo_VerticalSlice.Contracts.AnonymousEmail;
 using Lingo_VerticalSlice.Contracts.CardSetWord;
 using Lingo_VerticalSlice.Shared;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using static Lingo_VerticalSlice.Features.AnonymousEmail.SendAnonymousEmail.SendAnonymousEmail;
 
 namespace Lingo_VerticalSlice.Features.AnonymousEmail.SendAnonymousEmail;

@@ -43,19 +43,4 @@ public class AddCardSetToExistingFolderIntegrationTests: IClassFixture<CustomWeb
         
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
-
-    private WebApplicationFactory<Program> GetFactory(bool hasUser = false)
-    {
-        var projectDir = Directory.GetCurrentDirectory();
-        var configPath = Path.Combine(projectDir, "appsettings.test.json");
-        return _base.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureAppConfiguration(conf =>
-            {
-                conf.AddJsonFile(configPath);
-            });
-        })
-    }
-    
-    
 }

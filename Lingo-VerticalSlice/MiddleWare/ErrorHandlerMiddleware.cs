@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 using FluentValidation;
 using Lingo_VerticalSlice.Exceptions;
 using Lingo_VerticalSlice.Shared;
@@ -24,6 +25,7 @@ public class ErrorHandler
     {
         try
         {
+            
             await _next(httpContext);
             
             if (httpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)

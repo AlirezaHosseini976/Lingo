@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddControllers();
+
 builder.Services.AddAuthorization();    
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();

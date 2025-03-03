@@ -1,51 +1,55 @@
 ﻿using System.Data.Common;
 using Lingo_VerticalSlice.Database;
+using Lingo_VerticalSlice.Entities;
+using Lingo_VerticalSlice.Features.CardSet.CreateCardSetFolder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Lingo_VerticalSlice.IntegrationTest.NewBrandIntegrationTest;
 
-public class TestWebApplicationFactory<TEntryPoint> : WebApplicationFactory<TEntryPoint> where TEntryPoint : Program
+public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private readonly string _connectionString =
+        "Data Source=KRJ-HOSSEINI;Initial Catalog=NewDictionary;Integrated Security=true;TrustServerCertificate=True";
+
+    public async Task InitializeAsync()
+    {
+        using var scope = Services.CreateScope();
+
+        var scopedServices = scope.ServiceProvider;
+        var dbContext = scopedServices.GetRequiredService<ApplicationDbContext>();
+
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.MigrateAsync();
+    }
+
+    public new async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await Task.CompletedTask;
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-            if(descriptor != null)
-                services.Remove(descriptor);
-            services.AddScoped<DbConnection>(container =>
-            {
-                var connection = new SqlConnection(
-                    "Data Source=KRJ-HOSSEINI;Initial Catalog=NewDictionary;Integrated Security=true;TrustServerCertificate=True;");
-                connection.Open();
-                return connection;
-            });
-            services.AddDbContext<ApplicationDbContext>((container, options) =>
-            {
-                var connection = container.GetRequiredService<DbConnection>();
-                options.UseSqlServer(connection);
-            });
+            // var descriptor = services.SingleOrDefault(
+            //     d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+            // if (descriptor != null)
+            // {
+            //     services.Remove(descriptor);
+            // }
 
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            using (var appContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-            {
-                try
-                {
-                    appContext.Database.Migrate();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Database migration failed", ex);
-                }
-            }
+            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
+            services.AddDbContext<ApplicationDbContext>(options => { options.UseSqlServer(_connectionString); });
         });
-        
+        builder.UseEnvironment("Test");
     }
-    
 }
