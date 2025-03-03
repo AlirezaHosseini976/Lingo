@@ -1,9 +1,15 @@
-﻿using System.Net;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using Lingo_VerticalSlice.Contracts.Services;
 using Lingo_VerticalSlice.Database;
 using Lingo_VerticalSlice.Entities;
 using Lingo_VerticalSlice.Features.CardSet.CreateCardSetFolder;
 using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +33,8 @@ public class AddCardSetToExistingFolderIntegrationTest : IClassFixture<TestWebAp
     [Fact]
     public async Task AddCardSetToExistingFolder_EverythingIsOk_CardSetShouldBeAddedToFolderInDatabase()
     {
+        var password1 = "QAxlsx_123";
+
         //Arrange
         var user = new IdentityUser
         {
@@ -37,20 +45,14 @@ public class AddCardSetToExistingFolderIntegrationTest : IClassFixture<TestWebAp
         {
             Name = "default",
         };
-        var folder = new Folder
-        {
-            UserId = user.Id,
-            Name = "First Folder",
-            CardSets = new List<CardSet> { defaultCardSet },
-        };
-        using (var scope = _base.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            var result = await userManager.CreateAsync(user, "QAZwsx_123");
 
-            var repository = scope.ServiceProvider.GetRequiredService<ICreateCardSetFolderRepository>();
-            await repository.CreateCardSetFolderAsync(folder, CancellationToken.None);
-        }
+        // using (var scope = _base.Services.CreateScope())
+        //  {
+        // //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        // //     var result = await userManager.CreateAsync(user, password1);
+        //
+        //     
+        // }
 
 
         var client = _base.CreateClient(
@@ -58,15 +60,40 @@ public class AddCardSetToExistingFolderIntegrationTest : IClassFixture<TestWebAp
             {
                 AllowAutoRedirect = false
             });
-        var loginResult = await client.PostAsync("https://localhost:5001/login",
+        var signUp = await client.PostAsync("https://localhost:5001/register",
             new StringContent(
-                JsonSerializer.Serialize(new 
+                JsonSerializer.Serialize(new
                 {
-                    Email = user.Email,
-                    Password = "QAZwsx_123"
+                    email = "admin@gmail.com",
+                    password = password1,
                 }), Encoding.UTF8, mediaType: "application/json"));
-        var token = JsonSerializer.Deserialize<AccessTokenResponse>(await loginResult.Content.ReadAsStringAsync());
 
+        var loginResult = await client.PostAsync("https://localhost:5001/login?useCookies=false",
+            new StringContent(
+                JsonSerializer.Serialize(new
+                {
+                    email = user.Email,
+                    password = password1,
+                    twoFactorCode = "string",
+                    twoFactorRecoveryCode = "string"
+                }), Encoding.UTF8, mediaType: "application/json"));
+        var responseMessage = await loginResult.Content.ReadAsStringAsync();
+        var token = JsonSerializer.Deserialize<AccessTokenResponse>(responseMessage, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        var dbContext = _base.Services.GetRequiredService<ApplicationDbContext>();
+        var dbUser = await dbContext.Users.FirstOrDefaultAsync();
+
+        var folder = new Folder
+        {
+            UserId = dbUser.Id,
+            Name = "First Folder",
+            CardSets = new List<CardSet> { defaultCardSet },
+        };
+        var repository = _base.Services.GetRequiredService<ICreateCardSetFolderRepository>();
+        await repository.CreateCardSetFolderAsync(folder, CancellationToken.None);
 
         //Act
 
@@ -80,6 +107,6 @@ public class AddCardSetToExistingFolderIntegrationTest : IClassFixture<TestWebAp
                 }), Encoding.UTF8, "application/json"));
 
         //Assert 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

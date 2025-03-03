@@ -124,6 +124,7 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
             await signInManager.SignOutAsync();
             return Results.Ok();
         }
+
         return Results.Unauthorized();
     })
     .WithOpenApi()

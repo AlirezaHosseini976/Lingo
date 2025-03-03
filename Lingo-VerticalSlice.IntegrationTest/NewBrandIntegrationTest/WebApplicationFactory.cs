@@ -49,6 +49,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
 
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.AddDbContext<ApplicationDbContext>(options => { options.UseSqlServer(_connectionString); });
+            // services.AddHttpContextAccessor();
         });
         builder.UseEnvironment("Test");
     }

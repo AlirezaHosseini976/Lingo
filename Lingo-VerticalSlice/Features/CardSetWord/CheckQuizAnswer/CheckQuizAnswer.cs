@@ -27,7 +27,6 @@ public static class CheckQuizAnswer
             _checkQuizAnswer = checkQuizAnswer;
             _calculateNextStepService = calculateNextStepService;
             _userService = userService;
-            _userService = userService;
         }
 
         public async Task<Result<List<NextStepResponseItem>>> Handle(Command command, CancellationToken cancellationToken)

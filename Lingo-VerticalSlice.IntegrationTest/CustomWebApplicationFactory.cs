@@ -47,7 +47,9 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             {
                 var connection = container.GetRequiredService<DbConnection>();
                 options.UseSqlServer(connection);
+                
             });
+            
         });
 
         builder.UseEnvironment("Test");
